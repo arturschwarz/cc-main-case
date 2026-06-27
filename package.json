@@ -66,6 +66,10 @@
     "e2e:ios": "npm run prebuild:ios && npm run e2e:build && npm run e2e:test",
     "e2e:android": "npm run prebuild:android && npm run e2e:build:android && npm run e2e:test:android",
     "e2e:all": "npm run e2e:ios && npm run e2e:android",
+    "maestro:test": "maestro test e2e/maestro",
+    "maestro:test:ios": "maestro --device \"$(xcrun simctl list devices booted | grep -oE '[0-9A-F-]{36}' | head -1)\" test e2e/maestro",
+    "maestro:test:android": "maestro --device \"$(adb get-serialno)\" test e2e/maestro",
+    "maestro:test:all": "npm run maestro:test:ios && npm run maestro:test:android",
     "e2e:ios:debug": "npm run prebuild:ios && npm run e2e:build:debug && node e2e/with-metro.js npm run e2e:test:debug",
     "e2e:android:debug": "npm run prebuild:android && npm run e2e:build:android:debug && node e2e/with-metro.js npm run e2e:test:android:debug",
     "e2e:all:debug": "npm run e2e:ios:debug && npm run e2e:android:debug"

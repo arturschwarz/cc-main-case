@@ -1,0 +1,78 @@
+# Maestro E2E — full Users Directory flow (sort + search + detail) in one run.
+# Combines the sort-toggle and search/detail journeys against a single app launch
+# (mirrors e2e/starter.test.ts + e2e/sort.test.ts).
+#
+# Ordering: the app sorts by last name A->Z. asc -> Gabriel Adams (id 31) leads;
+# desc -> Layla Young (id 191) leads. "Emily" search surfaces Emily Johnson (id 1).
+#
+# Assumes a build that boots straight to Home (release, or a debug dev-client
+# build with Metro running + the deep-link launch — see README "Maestro").
+# Maestro polls the UI, so no sync/animation workarounds are needed.
+appId: com.example.usersdirectory
+---
+- launchApp
+
+# (1) Home loads the first page (lastName asc): Gabriel Adams (id 31) leads.
+- extendedWaitUntil:
+    visible:
+      id: "users-list"
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      id: "user-row-31"
+    timeout: 30000
+
+# (2) Sort: toggle to Z–A -> Layla Young (id 191) leads, Adams drops off...
+- tapOn:
+    id: "sort-toggle"
+- extendedWaitUntil:
+    visible:
+      id: "user-row-191"
+    timeout: 8000
+- assertNotVisible:
+    id: "user-row-31"
+# ...then toggle back to A–Z -> Adams (id 31) returns, Young drops off.
+- tapOn:
+    id: "sort-toggle"
+- extendedWaitUntil:
+    visible:
+      id: "user-row-31"
+    timeout: 8000
+- assertNotVisible:
+    id: "user-row-191"
+
+# (3) Search "Emily" -> Emily Johnson (id 1) appears; Adams (id 31) drops out.
+- tapOn:
+    id: "search-input"
+- inputText: "Emily"
+- extendedWaitUntil:
+    visible:
+      id: "user-row-1"
+    timeout: 8000
+- assertNotVisible:
+    id: "user-row-31"
+
+# (4) Clear -> the full sorted list returns (id 31 first again).
+- tapOn:
+    id: "search-clear"
+- extendedWaitUntil:
+    visible:
+      id: "user-row-31"
+    timeout: 8000
+
+# (5) Re-search and open Emily Johnson's (id 1) detail screen.
+- tapOn:
+    id: "search-input"
+- inputText: "Emily"
+- extendedWaitUntil:
+    visible:
+      id: "user-row-1"
+    timeout: 8000
+- tapOn:
+    id: "user-row-1"
+- extendedWaitUntil:
+    visible:
+      id: "user-detail"
+    timeout: 8000
+- assertVisible:
+    id: "collapsible-header"

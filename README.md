@@ -220,6 +220,51 @@ Home/search steps, then **disables synchronization** before opening the detail
 screen: Reanimated's UI-thread runtime keeps Detox's idle check from ever
 settling on the animated header, so auto-sync would otherwise hang there.
 
+### End-to-end (Maestro)
+
+The journeys are also written for **[Maestro](https://maestro.dev)** in
+`e2e/maestro/users-directory.yaml` — an alternative runner that drives the UI
+from YAML and matches elements by the same `testID`s. The Detox `starter` + `sort`
+specs are combined here into a **single flow** (load → sort toggle → search →
+clear → open detail) over one app launch. Maestro polls the screen, so the Detox
+sync/animation workarounds aren't needed; it reads as a plain list of taps and
+assertions.
+
+```bash
+# Install Maestro once: curl -fsSL https://get.maestro.mobile.dev | bash
+# Build + install the app on a booted simulator/emulator (e.g. one of):
+npm run prebuild:ios && npm run e2e:build        # or: npx expo run:ios / run:android
+
+npm run maestro:test                             # whatever single device Maestro auto-detects
+npm run maestro:test:ios                          # the booted iOS simulator
+npm run maestro:test:android                       # the running Android emulator
+npm run maestro:test:all                            # iOS then Android, sequentially
+# or directly: maestro test e2e/maestro/users-directory.yaml
+```
+
+Maestro drives **one device per run** and auto-picks an available one (so with
+only an Android emulator up, `maestro:test` runs Android). The `:ios` / `:android`
+scripts select the booted simulator / emulator explicitly via `--device`, and
+`:all` runs both in turn.
+
+Both flows start with `launchApp` and assume a build that **boots straight to
+Home** — i.e. a **release** build (recommended; the bundle is embedded), or a
+debug dev-client build with Metro running. For the dev-client case, start Metro
+(`npx expo start --dev-client`) and add an `openLink` step after `launchApp` to
+deep-link the client at it:
+
+```yaml
+# iOS simulator:
+- openLink: "usersdirectory://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+# Android emulator (host loopback is 10.0.2.2):
+- openLink: "usersdirectory://expo-development-client/?url=http%3A%2F%2F10.0.2.2%3A8081"
+```
+
+Like Detox, Maestro hits the real DummyJSON API and asserts the same fixed
+records (Gabriel Adams id 31 first ascending, Layla Young id 191 first
+descending, `Emily` search → Emily Johnson id 1). The header-collapse animation
+isn't asserted (same rationale as Detox).
+
 > **Status:** the offline-verifiable checks (`typecheck`, `typecheck:e2e`,
 > `lint`, `npm test`, Detox/Jest config loading, `expo prebuild`) were run and
 > pass. The native `detox build`/`test` run requires a local macOS + simulator
