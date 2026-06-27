@@ -230,8 +230,19 @@ clear → open detail) over one app launch. Maestro polls the screen, so the Det
 sync/animation workarounds aren't needed; it reads as a plain list of taps and
 assertions.
 
+**Install the Maestro CLI** (once). It needs a **JDK (11+)** on your PATH first
+(`brew install openjdk`), then:
+
 ```bash
-# Install Maestro once: curl -fsSL https://get.maestro.mobile.dev | bash
+curl -fsSL https://get.maestro.mobile.dev | bash   # installs to ~/.maestro
+export PATH="$PATH":"$HOME/.maestro/bin"            # add to your shell profile
+maestro --version                                   # verify it's on the PATH
+```
+
+(`applesimutils` — already needed for Detox — also lets Maestro manage iOS
+simulators.) Then build + install the app and run the flow:
+
+```bash
 # Build + install the app on a booted simulator/emulator (e.g. one of):
 npm run prebuild:ios && npm run e2e:build        # or: npx expo run:ios / run:android
 
