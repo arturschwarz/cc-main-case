@@ -17,9 +17,7 @@ export const ROW_HEIGHT = CARD_HEIGHT + spacing.md;
 
 export interface UserListItemProps {
   id: number;
-  /** Primary label — the User's full name. */
   fullName: string;
-  /** Secondary Summary field. */
   email: string;
   imageUri?: string;
   /** Receives the stable id; the handler resolves what to do (navigate). */

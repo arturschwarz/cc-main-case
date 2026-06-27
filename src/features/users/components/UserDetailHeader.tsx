@@ -12,10 +12,10 @@ import Animated, {
 import { Avatar, Text } from '@/ui/components';
 import { colors, spacing, typography } from '@/ui/theme';
 
-/** Fully-expanded header height (the detail ScrollView offsets content by this). */
+/** Fully-expanded header height (the scroll container offsets content by this). */
 export const HEADER_HEIGHT = 220;
 /** Collapsed height — a compact title bar with minimal top/bottom whitespace. */
-export const COMPACT_HEIGHT = 56;
+const COMPACT_HEIGHT = 56;
 /** Scroll distance over which the expanded block fades into the compact title. */
 const COLLAPSE_DISTANCE = 140;
 /** Upward drift applied to the expanded block as it fades out. */
@@ -24,7 +24,6 @@ const COLLAPSE_TRANSLATE = 24;
 const COMPACT_SLIDE = spacing.xl;
 
 export interface UserDetailHeaderProps {
-  /** Primary label — the User's full name. */
   fullName: string;
   /** Secondary line under the name (e.g. email). */
   subtitle?: string;

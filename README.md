@@ -204,12 +204,13 @@ src/
   app/                 NavigationContainer, native-stack navigator, typed routes
   features/users/
     api/               endpoints + typed query-key factory + hooks (useUsers/useUserSearch/useUser)
-    components/        UserListItem, SearchBar, SortToggle, SectionHeader, UserDetailHeader, UserDetailContent
-    lib/               buildSections (alphabetical grouping)
+    components/        UserListItem, SearchBar, SortToggle, SectionHeader, UserDetailHeader,
+                       UserDetailContent, UserDirectoryList, CollapsibleHeaderScrollView
+    lib/               buildSections (alphabetical grouping), flattenUsers (page-shape seam)
     screens/           HomeScreen, UserDetailScreen
     types/             User domain types, UserSort
   ui/
-    components/        Text, Avatar, Input, Button, Card
+    components/        Text, Avatar, Input, Button, Card, QueryStateView
     theme/             static design tokens (light-only)
   lib/                 apiClient, queryClient, env
   test/                renderWithProviders, MSW server, fixtures, reanimated mock
@@ -230,6 +231,29 @@ conventions are documented in `.claude/rules/*.md`, the domain glossary in
 ---
 
 ## Key decisions & tradeoffs
+
+### Screen composition (deep modules)
+
+Screens stay thin: they own local UI state (search term, sort order) and
+navigation, and compose modules that each hide one concern behind a small
+interface.
+
+- **`QueryStateView`** (`ui/`) owns the loading / error / retry / empty
+  presentation. Both screens were re-implementing the same branch; the four
+  states now live and are tested in one place, and each screen renders only its
+  ready content.
+- **`UserDirectoryList`** (`features/users/components`) owns the virtualized
+  `SectionList` — perf tuning, the Android/Fabric `removeClippedSubviews`
+  workaround, the footer spinner, and the pagination gating — so `HomeScreen`
+  passes ready-made sections and the directory's status, not list config.
+- **`CollapsibleHeaderScrollView`** owns the scroll-offset `SharedValue`, the
+  animated scroll handler, and the content inset that clears the header.
+  Reanimated no longer leaks into `UserDetailScreen`; callers pass header data
+  and body content.
+
+The result: `HomeScreen` and `UserDetailScreen` read as composition, and the
+extracted modules are unit-testable through their own interface rather than only
+through a full screen render.
 
 ### Data fetching
 

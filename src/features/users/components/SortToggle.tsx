@@ -6,7 +6,6 @@ import { colors, layout, radii, spacing } from '@/ui/theme';
 import type { SortOrder } from '../types';
 
 export interface SortToggleProps {
-  /** Current sort direction. */
   order: SortOrder;
   /** Flip the direction (asc ↔ desc). */
   onToggle: () => void;
