@@ -2,7 +2,6 @@ import { type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from './Button';
-import { Spinner } from './Spinner';
 import { Text } from './Text';
 import { colors, spacing } from '../theme';
 
@@ -15,13 +14,16 @@ export interface QueryStateViewProps {
   children?: ReactNode;
   /** Retry handler shown in the error state. */
   onRetry?: () => void;
-  /** Accessibility label for the loading spinner. */
-  loadingLabel?: string;
+  /**
+   * The loading UI (a skeleton), rendered while `status` is `loading`. It owns
+   * its own `testID`/accessibility.
+   */
+  loadingContent?: ReactNode;
   /** Message shown in the error state. */
   errorMessage?: string;
   /** Message shown in the empty state. */
   emptyMessage?: string;
-  /** testID applied to the centered container in the loading and error states. */
+  /** testID applied to the centered container in the error state. */
   containerTestID?: string;
 }
 
@@ -29,23 +31,20 @@ export interface QueryStateViewProps {
  * Owns the loading / error / empty presentation for a data-driven screen so each
  * screen renders only its ready content. The four states sit behind one small
  * interface (a status plus an optional retry), so they are tested once here
- * instead of re-implemented per screen.
+ * instead of re-implemented per screen. The loading UI is a screen-supplied
+ * skeleton; only the error and empty states are rendered generically.
  */
 export function QueryStateView({
   status,
   children,
   onRetry,
-  loadingLabel = 'Loading',
+  loadingContent,
   errorMessage = 'Something went wrong.',
   emptyMessage = 'Nothing to show right now.',
   containerTestID,
 }: QueryStateViewProps) {
   if (status === 'loading') {
-    return (
-      <View style={styles.centered} testID={containerTestID}>
-        <Spinner testID="loading-indicator" accessibilityLabel={loadingLabel} />
-      </View>
-    );
+    return <>{loadingContent ?? null}</>;
   }
 
   if (status === 'error') {

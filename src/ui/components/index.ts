@@ -16,5 +16,8 @@ export type { CardProps } from './Card';
 export { Spinner } from './Spinner';
 export type { SpinnerProps } from './Spinner';
 
+export { Skeleton } from './Skeleton';
+export type { SkeletonProps } from './Skeleton';
+
 export { QueryStateView } from './QueryStateView';
 export type { QueryStateViewProps, QueryViewStatus } from './QueryStateView';

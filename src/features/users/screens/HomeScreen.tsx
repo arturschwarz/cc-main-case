@@ -10,6 +10,7 @@ import { useUserDirectory } from '../api/useUserDirectory';
 import { SearchBar } from '../components/SearchBar';
 import { SortToggle } from '../components/SortToggle';
 import { UserDirectoryList } from '../components/UserDirectoryList';
+import { UserListSkeleton } from '../components/UserListSkeleton';
 import type { SortOrder, UserSort } from '../types';
 
 /**
@@ -69,7 +70,7 @@ export function HomeScreen({ navigation }: RootStackScreenProps<'Home'>) {
       <QueryStateView
         status={status}
         onRetry={handleRefresh}
-        loadingLabel="Loading users"
+        loadingContent={<UserListSkeleton />}
         errorMessage="Something went wrong while loading users."
         emptyMessage={
           isSearching ? `No users match "${term}".` : 'No users to show right now.'

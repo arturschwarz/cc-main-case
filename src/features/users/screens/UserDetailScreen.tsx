@@ -9,6 +9,7 @@ import { colors, spacing } from '@/ui/theme';
 import { useUser } from '../api/useUser';
 import { CollapsibleHeaderScrollView } from '../components/CollapsibleHeaderScrollView';
 import { UserDetailContent } from '../components/UserDetailContent';
+import { UserDetailSkeleton } from '../components/UserDetailSkeleton';
 import { getFullName } from '../components/format';
 
 /**
@@ -30,7 +31,7 @@ export function UserDetailScreen({ route }: RootStackScreenProps<'UserDetail'>) 
       <QueryStateView
         status={isError ? 'error' : 'loading'}
         onRetry={handleRetry}
-        loadingLabel="Loading user"
+        loadingContent={<UserDetailSkeleton />}
         errorMessage="Could not load this user."
         containerTestID="user-detail"
       />
