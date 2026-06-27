@@ -366,8 +366,29 @@ request per keystroke), with `keepPreviousData` to avoid flicker and a
 clear/reset control. The raw input text lives inside `SearchBar` so keystrokes
 don't re-render the list before the debounce fires; only the debounced term is
 lifted. An empty query shows the normal paginated list (search isn't called with
-an empty term). **Server-side over client-side filtering** because the dataset is
-paginated — a client filter would only match the rows already loaded.
+an empty term). **Server-side is the default over a naive client-side filter**
+because the dataset is paginated — filtering only the loaded rows would silently
+miss everyone else, giving results that depend on how far you'd scrolled.
+
+**Hybrid path** (see [ADR 0002](docs/adr/0002-hybrid-search.md)). On top of that
+default, search switches to instant local filtering *only when it's provably
+correct* — when the list cache is complete:
+
+- **Cache complete** (list fully paged in for the active sort → the whole
+  directory is in memory): filter locally on `firstName`/`lastName`/`email` and
+  **disable the search query** — zero requests, works offline, results exhaustive.
+- **Cache incomplete + online**: hit the server (a partial cache can't tell "3
+  matches" from "3 of 20").
+- **Cache incomplete + request fails (offline)**: fall back to best-effort local
+  matches and show an *"Offline — results may be incomplete"* notice
+  (`offline-notice`); never silently incomplete.
+
+All of this is encapsulated in `useUserDirectory` (the screen just reads
+`isPartialResults`). It **fails safe**: request-cutting only engages once the
+cache completes — realistic for the ~208-user set (7 pages), and on a genuinely
+huge dataset it simply no-ops back to server search rather than breaking
+correctness. Local field parity with the server is approximate (mirrors the
+fields DummyJSON is confirmed to index and we model).
 
 ### Sort
 

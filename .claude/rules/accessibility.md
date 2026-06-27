@@ -64,6 +64,7 @@ Canonical testIDs:
 | Retry button            | `retry-button`        |
 | Loading indicator       | `loading-indicator`   |
 | Empty state             | `empty-state`         |
+| Offline/partial notice  | `offline-notice`      |
 
 Keep this table authoritative; update it (and `testing.md`) when adding new
 targeted elements.

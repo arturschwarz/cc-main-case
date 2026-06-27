@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { RootStackScreenProps } from '@/app/navigation';
-import { QueryStateView, type QueryViewStatus } from '@/ui/components';
-import { colors, spacing } from '@/ui/theme';
+import { QueryStateView, Text, type QueryViewStatus } from '@/ui/components';
+import { colors, radii, spacing } from '@/ui/theme';
 
 import { useUserDirectory } from '../api/useUserDirectory';
 import { SearchBar } from '../components/SearchBar';
@@ -42,6 +42,7 @@ export function HomeScreen({ navigation }: RootStackScreenProps<'Home'>) {
     hasNextPage,
     fetchNextPage,
     refetch,
+    isPartialResults,
   } = useUserDirectory({ term, sort });
 
   const handlePress = useCallback(
@@ -67,6 +68,17 @@ export function HomeScreen({ navigation }: RootStackScreenProps<'Home'>) {
         <SearchBar onDebouncedChange={setTerm} />
         <SortToggle order={order} onToggle={toggleOrder} />
       </View>
+      {isPartialResults ? (
+        <View
+          style={styles.notice}
+          testID="offline-notice"
+          accessibilityRole="alert"
+        >
+          <Text variant="caption" color="secondary">
+            Offline — showing cached matches; results may be incomplete.
+          </Text>
+        </View>
+      ) : null}
       <QueryStateView
         status={status}
         onRetry={handleRefresh}
@@ -105,5 +117,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
+  },
+  notice: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    padding: spacing.sm,
+    borderRadius: radii.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 });
