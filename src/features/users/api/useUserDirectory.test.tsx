@@ -133,3 +133,67 @@ describe('useUserDirectory — hybrid search', () => {
     expect(result.current.isError).toBe(false);
   });
 });
+
+describe('useUserDirectory — client-side sort toggle', () => {
+  /** List handler that records the `order` of every request and serves it sorted. */
+  function serveSortedList(users: User[], orders: string[]) {
+    server.use(
+      http.get(`${env.apiBaseUrl}/users`, ({ request }) => {
+        const url = new URL(request.url);
+        orders.push(url.searchParams.get('order') ?? 'none');
+        const asc = [...users].sort((a, b) => a.lastName.localeCompare(b.lastName));
+        const ordered = url.searchParams.get('order') === 'desc' ? asc.reverse() : asc;
+        return paginate(ordered, url);
+      }),
+    );
+  }
+
+  it('derives the opposite order by reversing the cache, with NO request, when complete', async () => {
+    const orders: string[] = [];
+    serveSortedList(usersFixture, orders); // 3 users = one complete page
+
+    const { result, rerender } = await renderHook(
+      ({ order }: { order: 'asc' | 'desc' }) =>
+        useUserDirectory({ term: '', sort: { sortBy: 'lastName', order } }),
+      { wrapper: wrapper(), initialProps: { order: 'asc' as const } },
+    );
+
+    // Wait for the (single, complete) asc page to load.
+    await waitFor(() =>
+      expect(flatNames(result.current.sections)).toEqual([
+        'Sophia Brown',
+        'Emily Johnson',
+        'Michael Williams',
+      ]),
+    );
+    const ascNames = flatNames(result.current.sections);
+    expect(result.current.hasNextPage).toBe(false); // complete
+
+    rerender({ order: 'desc' });
+
+    await waitFor(() =>
+      expect(flatNames(result.current.sections)).toEqual([...ascNames].reverse()),
+    );
+    // Only the ascending order was ever requested; desc came from the cache.
+    expect(orders).toEqual(['asc']);
+    expect(result.current.hasNextPage).toBe(false);
+  });
+
+  it('fetches the opposite order from the server while the cache is incomplete', async () => {
+    const orders: string[] = [];
+    serveSortedList(largeUsersFixture, orders); // 65 users = multiple pages
+
+    const { result, rerender } = await renderHook(
+      ({ order }: { order: 'asc' | 'desc' }) =>
+        useUserDirectory({ term: '', sort: { sortBy: 'lastName', order } }),
+      { wrapper: wrapper(), initialProps: { order: 'asc' as const } },
+    );
+
+    await waitFor(() => expect(result.current.hasNextPage).toBe(true)); // incomplete
+
+    rerender({ order: 'desc' });
+
+    // Reversing a partial cache would be wrong, so we must hit the server.
+    await waitFor(() => expect(orders).toContain('desc'));
+  });
+});

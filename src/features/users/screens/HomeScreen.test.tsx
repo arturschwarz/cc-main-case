@@ -129,31 +129,40 @@ describe('HomeScreen', () => {
     });
   });
 
-  it('requests the active sort, switching to desc when toggled', async () => {
-    const requests: { sortBy: string | null; order: string | null }[] = [];
+  it('requests asc on first load, then toggles to desc from cache without a new request', async () => {
+    const orders: (string | null)[] = [];
+    // The server only ever sees asc here (desc is derived client-side); serve it
+    // last-name sorted so the client-side reverse equals a true Z–A order.
+    const ascSorted = [...usersFixture].sort((a, b) =>
+      a.lastName.localeCompare(b.lastName),
+    );
     server.use(
       http.get(`${base}/users`, ({ request }) => {
-        const url = new URL(request.url);
-        requests.push({
-          sortBy: url.searchParams.get('sortBy'),
-          order: url.searchParams.get('order'),
-        });
-        return listResponse();
+        orders.push(new URL(request.url).searchParams.get('order'));
+        return listResponse(ascSorted);
       }),
     );
 
     await renderWithProviders(<App />);
     expect(await screen.findByText('Emily Johnson')).toBeOnTheScreen();
 
-    // First load carries the default ascending last-name sort.
-    expect(requests[0]).toEqual({ sortBy: 'lastName', order: 'asc' });
+    // First load carries the default ascending last-name sort, and the 3-user
+    // fixture fits one page, so the cache is complete.
+    expect(orders).toEqual(['asc']);
 
     await fireEvent.press(screen.getByTestId('sort-toggle'));
 
-    // Toggling fires a fresh request with order=desc.
-    await waitFor(() =>
-      expect(requests).toContainEqual({ sortBy: 'lastName', order: 'desc' }),
-    );
+    // Z–A is derived by reversing the complete cache — the list reorders with no
+    // additional request (see ADR 0003).
+    await waitFor(() => {
+      const rows = screen.getAllByTestId(/^user-row-/);
+      expect(rows.map((row) => row.props.testID)).toEqual([
+        'user-row-2',
+        'user-row-1',
+        'user-row-3',
+      ]);
+    });
+    expect(orders).toEqual(['asc']);
   });
 
   it('renders sticky section headers grouped by last-name initial', async () => {

@@ -393,12 +393,21 @@ fields DummyJSON is confirmed to index and we model).
 ### Sort
 
 Server-side via `sortBy=lastName&order=asc|desc`, toggled A–Z / Z–A (default
-A–Z), applied to **both** list and search. **Server-side is required, not a
-preference:** with infinite pagination a client `.sort()` only reorders the rows
-already fetched, so the next page would break global ordering. The sort is part
-of the React Query key, so each variant is its own cache entry (toggling back is
-instant from cache); `keepPreviousData` keeps the current order on screen while
-the new order loads.
+A–Z), applied to **both** list and search. The sort is part of the React Query
+key, so each direction is its own cache entry.
+
+**Toggle from cache, no request** (see [ADR 0003](docs/adr/0003-client-side-sort-toggle.md)).
+A–Z and Z–A are exact reverses *over the same complete dataset*, so once either
+direction is fully paged in, the opposite direction is derived by reversing the
+cache **client-side — zero API calls** (the opposite query is disabled). Whichever
+direction the user finishes loading first makes every later toggle free.
+
+Server-side sort is still **required for the incomplete case**: reversing a
+partial cache would show the reverse of the loaded *prefix* (≈the alphabetical
+top, flipped), not the true tail — so while neither direction is complete we
+fetch the requested order, then cache it. It **fails safe**: a dataset too large
+to fully cache simply never hits the derive branch and gets plain server-side
+sort. `keepPreviousData` keeps the current order on screen while a fetch settles.
 
 ### Sticky section headers
 
