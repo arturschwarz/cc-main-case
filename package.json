@@ -60,12 +60,15 @@
     "e2e:build:android": "detox build -c android.emu.release",
     "e2e:test:android": "detox test -c android.emu.release",
     "e2e:build:debug": "detox build -c ios.sim.debug",
-    "e2e:test:debug": "detox test -c ios.sim.debug",
+    "e2e:test:debug": "E2E_DEV_CLIENT=1 detox test -c ios.sim.debug",
     "e2e:build:android:debug": "detox build -c android.emu.debug",
-    "e2e:test:android:debug": "detox test -c android.emu.debug",
+    "e2e:test:android:debug": "E2E_DEV_CLIENT=1 detox test -c android.emu.debug",
     "e2e:ios": "npm run prebuild:ios && npm run e2e:build && npm run e2e:test",
     "e2e:android": "npm run prebuild:android && npm run e2e:build:android && npm run e2e:test:android",
-    "e2e:all": "npm run e2e:ios && npm run e2e:android"
+    "e2e:all": "npm run e2e:ios && npm run e2e:android",
+    "e2e:ios:debug": "npm run prebuild:ios && npm run e2e:build:debug && node e2e/with-metro.js npm run e2e:test:debug",
+    "e2e:android:debug": "npm run prebuild:android && npm run e2e:build:android:debug && node e2e/with-metro.js npm run e2e:test:android:debug",
+    "e2e:all:debug": "npm run e2e:ios:debug && npm run e2e:android:debug"
   },
   "private": true
 }

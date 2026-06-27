@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import {
-  ActivityIndicator,
   SectionList,
   StyleSheet,
   View,
   type SectionListRenderItem,
 } from 'react-native';
 
+import { Spinner } from '@/ui/components';
 import { spacing } from '@/ui/theme';
 
 import type { UserSection } from '../lib/sections';
@@ -80,7 +80,8 @@ export function UserDirectoryList({
 
   const listFooter = isFetchingNextPage ? (
     <View style={styles.footer}>
-      <ActivityIndicator
+      <Spinner
+        size={24}
         testID="loading-indicator-footer"
         accessibilityLabel="Loading more users"
       />

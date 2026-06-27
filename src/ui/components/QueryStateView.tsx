@@ -1,7 +1,8 @@
 import { type ReactNode } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Button } from './Button';
+import { Spinner } from './Spinner';
 import { Text } from './Text';
 import { colors, spacing } from '../theme';
 
@@ -42,10 +43,7 @@ export function QueryStateView({
   if (status === 'loading') {
     return (
       <View style={styles.centered} testID={containerTestID}>
-        <ActivityIndicator
-          testID="loading-indicator"
-          accessibilityLabel={loadingLabel}
-        />
+        <Spinner testID="loading-indicator" accessibilityLabel={loadingLabel} />
       </View>
     );
   }

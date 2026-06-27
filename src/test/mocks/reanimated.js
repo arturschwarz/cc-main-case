@@ -36,4 +36,20 @@ module.exports = {
   Extrapolate: Extrapolation,
   runOnJS: (fn) => fn,
   runOnUI: (fn) => fn,
+  // Timing helpers resolve to their target value so styles read a stable result
+  // synchronously in tests; the real UI-thread animation only runs in the app.
+  withTiming: (toValue) => toValue,
+  withSpring: (toValue) => toValue,
+  withRepeat: (value) => value,
+  withDelay: (_delay, value) => value,
+  cancelAnimation: noop,
+  Easing: {
+    linear: (t) => t,
+    ease: (t) => t,
+    quad: (t) => t,
+    in: (fn) => fn,
+    out: (fn) => fn,
+    inOut: (fn) => fn,
+    bezier: () => (t) => t,
+  },
 };

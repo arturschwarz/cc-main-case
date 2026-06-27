@@ -15,21 +15,23 @@
  * `waitFor` is imported explicitly so it shadows Jest's global; `describe`/
  * `beforeAll`/`it` remain Jest globals.
  */
-import { by, device, element, waitFor } from 'detox';
+import { by, element, waitFor } from 'detox';
+
+import { launchAtHome } from './launch';
 
 describe('Users Directory sort toggle', () => {
   beforeAll(async () => {
-    await device.launchApp({ newInstance: true });
+    await launchAtHome();
   });
 
   it('reorders the list between A–Z and Z–A', async () => {
     // Default state is A–Z: Gabriel Adams (id 31) leads the list.
     await waitFor(element(by.id('users-list')))
       .toBeVisible()
-      .withTimeout(15000);
+      .withTimeout(60000);
     await waitFor(element(by.id('user-row-31')))
       .toBeVisible()
-      .withTimeout(15000);
+      .withTimeout(60000);
 
     // Toggle to Z–A: the list re-fetches sorted descending, so Layla Young
     // (id 191) becomes the first row and Adams (id 31) drops off the top.

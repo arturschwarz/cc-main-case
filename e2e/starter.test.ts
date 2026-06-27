@@ -21,9 +21,11 @@
  */
 import { by, device, element, waitFor } from 'detox';
 
+import { launchAtHome } from './launch';
+
 describe('Users Directory E2E flow', () => {
   beforeAll(async () => {
-    await device.launchApp({ newInstance: true });
+    await launchAtHome();
   });
 
   it('loads, searches, clears, and opens a user detail screen', async () => {
@@ -31,10 +33,10 @@ describe('Users Directory E2E flow', () => {
     // "A" section leads and Gabriel Adams (id 31) is the first row.
     await waitFor(element(by.id('users-list')))
       .toBeVisible()
-      .withTimeout(15000);
+      .withTimeout(60000);
     await waitFor(element(by.id('user-row-31')))
       .toBeVisible()
-      .withTimeout(15000);
+      .withTimeout(60000);
 
     // (2) Search "Emily" -> server-side search (also lastName-sorted) returns
     // Emily Brown (id 103) + Emily Johnson (id 1); Gabriel Adams (id 31) is

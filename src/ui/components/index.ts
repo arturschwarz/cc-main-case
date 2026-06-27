@@ -13,5 +13,8 @@ export type { ButtonProps, ButtonVariant } from './Button';
 export { Card } from './Card';
 export type { CardProps } from './Card';
 
+export { Spinner } from './Spinner';
+export type { SpinnerProps } from './Spinner';
+
 export { QueryStateView } from './QueryStateView';
 export type { QueryStateViewProps, QueryViewStatus } from './QueryStateView';

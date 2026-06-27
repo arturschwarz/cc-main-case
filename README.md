@@ -147,16 +147,57 @@ npm run e2e:build:android # detox build -c android.emu.release
 npm run e2e:test:android  # detox test  -c android.emu.release
 ```
 
-**Why release builds for E2E?** The default app build is an Expo **dev client**
-that loads JS from Metro over the network; under Detox's cold launch (no Metro
-URL) it just shows the "enter a URL" launcher and the test hangs. The `e2e:*`
+**Why release builds for the default E2E?** The default app build is an Expo
+**dev client** that loads JS from Metro over the network; under Detox's cold
+launch it just shows the "enter a URL" launcher and the test hangs. The `e2e:*`
 scripts therefore use **release** configs, which embed the JS bundle — the app
 is self-contained, needs no Metro, and boots straight into Home (deterministic,
 as Detox recommends). Expo signs the release variant with the debug keystore, so
-no signing setup is required. The Metro-attached dev-client path is still
-available if you want it — run `npx expo start --dev-client` in one terminal,
-then `npm run e2e:build:debug && npm run e2e:test:debug` (append `:android` for
+no signing setup is required.
+
+**Running the debug (dev-client) E2E.** Debug builds are useful for fast
+iteration and breakpoints. Two things make them work where a naive run hangs on
+the launcher:
+
+1. **Metro must be running**, and
+2. **the app must be deep-linked at it** — otherwise the dev client sits on the
+   launcher screen.
+
+Both are handled for you:
+
+```bash
+npm run e2e:ios:debug       # prebuild -> debug build -> (boot Metro) -> test -> stop Metro
+npm run e2e:android:debug
+```
+
+`e2e/with-metro.js` boots `expo start --dev-client`, waits until it's serving,
+runs the suite, then shuts it down. The launch itself goes through
+`launchAtHome()` (`e2e/launch.ts`): when `E2E_DEV_CLIENT=1` (set by the debug
+test scripts) it deep-links the dev client at the
+`usersdirectory://expo-development-client/?url=http://<host>:8081` URL (`<host>`
+is `localhost` on iOS, `10.0.2.2` on the Android emulator) so it skips the
+launcher and loads our bundle. **Delivery differs per platform:**
+
+- **iOS** — cold-launch, then `openURL`. Passing `url` to a cold `launchApp` is
+  dropped by some iOS dev-client versions (you stay on the launcher).
+- **Android** — deliver the URL as the cold-launch intent (`launchApp({ url })`).
+  `openURL` only sends a VIEW intent to the already-foreground launcher, which
+  doesn't reload it (the menu just stays up).
+
+The first run then waits on Metro's **initial bundle build**, so the first spec
+query allows 60s. To run against an already-running Metro, use the lower-level
+`npm run e2e:build:debug && npm run e2e:test:debug` (append `:android` for
 Android).
+
+The dev client otherwise shows a one-time **"developer info" onboarding bottom
+sheet** (and auto-opens the dev menu) on a fresh install, which blocks the test
+behind a popup. A small config plugin in `app.config.ts` (`withQuietDevMenu`)
+disables this at the native level — it writes `EXDevMenuShowsAtLaunch=false`,
+`EXDevMenuIsOnboardingFinished=true`, and `EXDevMenuShowFloatingActionButton=false`
+into the iOS `Info.plist` and the Android `<application>` meta-data at prebuild,
+which expo-dev-menu reads on launch. The dev menu is still reachable via shake /
+⌘D; only the launch-time popups are suppressed. (Baked at build time, so it takes
+effect on the next `prebuild` + build.)
 
 **E2E prerequisites:** macOS + Xcode (iOS) / Android Studio with any AVD
 (Android), CocoaPods, **`applesimutils`** (`brew tap wix/brew && brew install
