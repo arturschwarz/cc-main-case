@@ -28,10 +28,10 @@ describe('Users Directory sort toggle', () => {
     // Default state is A–Z: Gabriel Adams (id 31) leads the list.
     await waitFor(element(by.id('users-list')))
       .toBeVisible()
-      .withTimeout(60000);
+      .withTimeout(30000);
     await waitFor(element(by.id('user-row-31')))
       .toBeVisible()
-      .withTimeout(60000);
+      .withTimeout(30000);
 
     // Toggle to Z–A: the list re-fetches sorted descending, so Layla Young
     // (id 191) becomes the first row and Adams (id 31) drops off the top.
