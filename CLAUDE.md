@@ -111,7 +111,7 @@ npm run e2e:test                # detox test
 ### Issue tracker
 
 No issue tracker is used for this repo. Issue-tracking skills (`triage`,
-`to-issues`, `qa`) should no-op rather than create issues. See
+`to-issues`) should no-op rather than create issues. See
 `docs/agents/issue-tracker.md`.
 
 ### Triage labels
