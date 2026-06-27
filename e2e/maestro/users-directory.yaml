@@ -76,3 +76,13 @@ appId: com.example.usersdirectory
     timeout: 8000
 - assertVisible:
     id: "collapsible-header"
+
+# (6) Interact with the animated element (PDF E2E step 4): scroll the detail body
+# to collapse the header, then assert the compact title — which only fades in as
+# the header collapses — is now visible. The visible compact title is the
+# observable result of the scroll-driven collapse. (Maestro plays animations, so
+# unlike Detox this can be asserted end-to-end.)
+- swipe:
+    direction: UP
+- assertVisible:
+    id: "detail-compact-title"

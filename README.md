@@ -83,12 +83,13 @@ npm test              # jest (jest-expo preset)
 npm run test:watch
 ```
 
-26 tests across 6 suites. Coverage highlights:
+63 tests across 17 suites. Coverage highlights:
 
-- **Design system** — `Button` (label, press, disabled/loading blocks press, a11y role/state).
-- **Home screen** — loading→data, error+retry, empty, search filter + clear-reset, pagination request, sort reordering + sort request params, sticky section headers + ordering.
+- **Design system** — `Button` (label, press, disabled/loading blocks press, a11y role/state), plus `QueryStateView`, `Spinner`, and `Skeleton`.
+- **Home screen** — loading→data, error+retry, empty, search filter + clear-reset, pagination request, sort reordering + cache-only toggle (no request), sticky section headers + ordering.
+- **Search & sort logic** — `useUserDirectory` hybrid search (local when cache complete, server otherwise, offline fallback) and client-side sort-from-cache; `filterUsers` field matching.
 - **Detail screen** — instant placeholder render from cache, then detail-only fields after the by-id fetch.
-- **Pure logic** — `buildSections` grouping (`sections.test.ts`), the MSW boundary smoke test.
+- **Pure logic & infra** — `buildSections` grouping, `flattenUsers`, `apiClient` (timeout/abort/error normalization), endpoint URL building, and the MSW boundary smoke test.
 
 **Network mocking — MSW at the network boundary.** Tests run the real
 `apiClient` + React Query against [MSW](https://mswjs.io) handlers in
@@ -201,9 +202,12 @@ effect on the next `prebuild` + build.)
 
 **E2E prerequisites:** macOS + Xcode (iOS) / Android Studio with any AVD
 (Android), CocoaPods, **`applesimutils`** (`brew tap wix/brew && brew install
-applesimutils`), `npm install`, and network access. The header-collapse animation
-is not asserted in E2E (Detox runs with animations disabled, so the crossfade
-never plays under test); it's covered by the unit/integration suite instead.
+applesimutils`), `npm install`, and network access. The Detox flow asserts the
+collapsible header is **present** but does not scroll to collapse it — Detox runs
+with animations disabled, so the crossfade never plays under test. The required
+"interact with an animated element + observable result" step is asserted in the
+**Maestro** flow instead (see below), which plays animations; the collapse logic
+is additionally covered by the unit/integration suite.
 
 `.detoxrc.js` **auto-detects** a device so no per-machine edit is needed: it
 picks the newest available iPhone simulator (`xcrun simctl list`) and the first
@@ -226,9 +230,15 @@ The journeys are also written for **[Maestro](https://maestro.dev)** in
 `e2e/maestro/users-directory.yaml` — an alternative runner that drives the UI
 from YAML and matches elements by the same `testID`s. The Detox `starter` + `sort`
 specs are combined here into a **single flow** (load → sort toggle → search →
-clear → open detail) over one app launch. Maestro polls the screen, so the Detox
-sync/animation workarounds aren't needed; it reads as a plain list of taps and
-assertions.
+clear → open detail → **collapse header**) over one app launch. Maestro polls the
+screen, so the Detox sync/animation workarounds aren't needed; it reads as a plain
+list of taps and assertions.
+
+Because Maestro plays animations (unlike Detox), this flow is where the brief's
+required *"interact with an animated element and validate an observable result"*
+step is asserted end-to-end: it scrolls the detail body to collapse the header and
+asserts the compact title (`detail-compact-title`) — which only fades in as the
+header collapses — becomes visible.
 
 **Install the Maestro CLI** (once). It needs a **JDK (11+)** on your PATH first
 (`brew install openjdk`), then:
@@ -240,12 +250,26 @@ maestro --version                                   # verify it's on the PATH
 ```
 
 (`applesimutils` — already needed for Detox — also lets Maestro manage iOS
-simulators.) Then build + install the app and run the flow:
+simulators.)
+
+**Install a release build first — this is the common gotcha.** The
+`maestro:test:*` scripts only run `maestro test`; they do **not** build or install
+anything, so they run against whatever app is already on the device. Maestro's
+flow opens with a bare `launchApp`, so the installed app must **boot straight to
+Home** — which means a **release** build (the JS bundle is embedded). A debug
+*dev-client* build (what `npm run android` / `npx expo run:android` installs)
+instead boots to the Metro "enter URL" launcher, and Maestro gets stuck there.
+Install a release build per platform (Expo signs it with the debug keystore, so no
+signing setup is needed):
 
 ```bash
-# Build + install the app on a booted simulator/emulator (e.g. one of):
-npm run prebuild:ios && npm run e2e:build        # or: npx expo run:ios / run:android
+npx expo run:ios --configuration Release    # builds + installs on the booted simulator
+npx expo run:android --variant release      # builds + installs on the running emulator
+```
 
+Then run the flow:
+
+```bash
 npm run maestro:test                             # whatever single device Maestro auto-detects
 npm run maestro:test:ios                          # the booted iOS simulator
 npm run maestro:test:android                       # the running Android emulator
@@ -256,13 +280,15 @@ npm run maestro:test:all                            # iOS then Android, sequenti
 Maestro drives **one device per run** and auto-picks an available one (so with
 only an Android emulator up, `maestro:test` runs Android). The `:ios` / `:android`
 scripts select the booted simulator / emulator explicitly via `--device`, and
-`:all` runs both in turn.
+`:all` runs both in turn — so `:all` needs a release build installed on **both**
+a booted iOS simulator and a running Android emulator.
 
-Both flows start with `launchApp` and assume a build that **boots straight to
-Home** — i.e. a **release** build (recommended; the bundle is embedded), or a
-debug dev-client build with Metro running. For the dev-client case, start Metro
+**Debug dev-client alternative (not recommended for Maestro).** You can point
+Maestro at a debug build, but then you must keep Metro running
 (`npx expo start --dev-client`) and add an `openLink` step after `launchApp` to
-deep-link the client at it:
+deep-link the client at it — and the URL is **per-platform**, so the single shared
+`users-directory.yaml` can't serve iOS and Android at once (this is why release is
+the clean path):
 
 ```yaml
 # iOS simulator:
@@ -273,8 +299,9 @@ deep-link the client at it:
 
 Like Detox, Maestro hits the real DummyJSON API and asserts the same fixed
 records (Gabriel Adams id 31 first ascending, Layla Young id 191 first
-descending, `Emily` search → Emily Johnson id 1). The header-collapse animation
-isn't asserted (same rationale as Detox).
+descending, `Emily` search → Emily Johnson id 1). Unlike Detox, it also asserts
+the header-collapse animation's observable result (scroll → compact title
+appears).
 
 > **Status:** the offline-verifiable checks (`typecheck`, `typecheck:e2e`,
 > `lint`, `npm test`, Detox/Jest config loading, `expo prebuild`) were run and
@@ -411,14 +438,24 @@ sort. `keepPreviousData` keeps the current order on screen while a fetch settles
 
 ### Sticky section headers
 
-The list is a `SectionList` grouping users by **last-name initial** — which
-matches the last-name sort, so sections stay contiguous and correctly ordered in
-both directions (`buildSections` is a single O(n) pass over the
-already-server-sorted data; non-alpha last names fall into a `#` bucket, which
-assumes the clean DummyJSON data). Headers are sticky in both list and search.
-Switching from `FlatList` meant dropping `getItemLayout` (a correct SectionList
-implementation is error-prone and ships no first-party helper) — fixed row +
-header heights keep measurement cheap; revisiting this is in "what I'd improve".
+**On `SectionList` vs `FlatList`.** The brief asks for a `FlatList`; this list
+uses `SectionList` deliberately. `SectionList` is part of React Native's
+`FlatList` family — both are thin wrappers over the same `VirtualizedList`, with
+the same virtualization, `keyExtractor`, `onEndReached`/`onEndReachedThreshold`
+pagination, and `refreshing`/`onRefresh` pull-to-refresh — so none of the
+list-performance requirements change. We chose it only to get **native sticky
+last-name section headers** (`stickySectionHeadersEnabled`) for free, which a
+plain `FlatList` can't do without hand-rolling sticky behavior. The single
+tradeoff is below.
+
+The list groups users by **last-name initial** — which matches the last-name
+sort, so sections stay contiguous and correctly ordered in both directions
+(`buildSections` is a single O(n) pass over the already-server-sorted data;
+non-alpha last names fall into a `#` bucket, which assumes the clean DummyJSON
+data). Headers are sticky in both list and search. Choosing `SectionList` meant
+dropping `getItemLayout` (a correct one for sections is error-prone and ships no
+first-party helper) — fixed row + header heights keep measurement cheap;
+revisiting this is in "what I'd improve".
 
 > Note: the index letter follows the **last name** (the sort key), while a row's
 > prominent text is the first name — intentional, but a screen reader announces
