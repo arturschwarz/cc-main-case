@@ -39,6 +39,7 @@
 .pp-progress__fill {
   height: 100%;
   background: #e9eaed;       /* bright progress fill */
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.35), 0 0 9px rgba(255, 255, 255, 0.2);
   transition: width 450ms ease;
 }
 .pp-footer__row {

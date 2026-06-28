@@ -8,7 +8,7 @@ class: text-left
 transition: fade-out
 mdc: true
 colorSchema: dark
-background: '#121317'
+background: '#000000'
 fonts:
   sans: Inter
   serif: Space Grotesk
@@ -33,7 +33,7 @@ fonts:
 
 <v-clicks depth="2">
 
-- **Implemented using Claude Code 4.8 Opus** — with a sophisticated config setup
+- **Implemented using Claude Code 4.8 Opus** — with a sophisticated rules/architecture setup
 - **Rules as guardrails** — `CLAUDE.md` + `.claude/rules` encode the conventions up front
   - `accessibility.md` —  defines accessibility rules for UI elements
   - `architecture.md` — defines how code is ogranized and how data flows
@@ -99,7 +99,7 @@ import featureVideo from './assets/cc-main-case-video-1.mov'
 
 /* Just centers the video; the gradient now lives on the slide background. */
 .video-stage {
-  height: 95%;
+  height: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,7 +107,7 @@ import featureVideo from './assets/cc-main-case-video-1.mov'
   z-index: 20;          /* > the .slidev-layout::after fade (z-index: 10) */
 }
 .feature-video {
-  max-height: 40vh;   /* relative to the slide, not the browser viewport */
+  max-height: 95%;   /* relative to the slide, not the browser viewport */
   max-width: 100%;
   object-fit: contain;
   border-radius: 12px;
@@ -116,20 +116,6 @@ import featureVideo from './assets/cc-main-case-video-1.mov'
 /* Horizontal fade so the slide-left transition into the next slide is smooth:
    0–50% untouched, 50–85% fades to black, 85–100% fades back to the bg color. */
 .slidev-layout { position: relative; }
-.slidev-layout::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    transparent 50%,
-    #000 85%,
-    #121317 100%
-  );
-  pointer-events: none;
-  z-index: 10;
-}
 </style>
 
 ---
@@ -173,7 +159,7 @@ import archLayers from './assets/architecture_overview_1.png'
 
 /* Architecture image (right column), vertically centered. */
 .arch-img-wrap { height: 100%; display: flex; align-items: center; justify-content: center; }
-.arch-img-wrap img { max-width: 100%; max-height: 80vh; object-fit: contain; }
+.arch-img-wrap img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; box-shadow: 0 0 12px rgba(255, 255, 255, 0.18), 0 0 28px rgba(255, 255, 255, 0.1); }
 </style>
 
 ---
@@ -216,7 +202,7 @@ import archFeatures from './assets/architecture_overview_2.png'
 
 /* Architecture image (right column), vertically centered. */
 .arch-img-wrap { height: 100%; display: flex; align-items: center; justify-content: center; }
-.arch-img-wrap img { max-width: 100%; max-height: 80vh; object-fit: contain; }
+.arch-img-wrap img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; box-shadow: 0 0 12px rgba(255, 255, 255, 0.18), 0 0 28px rgba(255, 255, 255, 0.1); }
 </style>
 
 ---
