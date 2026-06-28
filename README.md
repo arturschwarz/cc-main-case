@@ -506,12 +506,10 @@ screen-reader readable. Errors are never swallowed silently.
 ## What I'd improve with more time
 
 - **Run Detox in CI** against a managed simulator/emulator (the suite is written and config-verified; only the native run is environment-gated here).
-- **`getItemLayout` for `SectionList`** (or migrate to `@shopify/flash-list`) if profiling shows scroll jank on very large datasets.
-- **Dark mode** via the existing token system + a thin `ThemeProvider`.
 - **Richer sort** — sort by first name too, persist the choice, and add an alphabet scrubber / jump-to-letter index.
-- **Scope Android cleartext to debug builds only** (currently all build types) and drop the `@config-plugins/detox` `overrides` once an SDK-56 build ships.
+- **Scope Android cleartext to debug builds only** (currently all build types) and drop the `@config-plugins/detox` `overrides` once an SDK-56 build ships
 - **Resilience UX** — retry/backoff and an offline indicator; an image error fallback state on `Avatar`.
-- **Test polish** — add a search+sort integration test and silence the benign React Query `act()` warning so the suite can fail on console errors.
+- **Test polish** — add a search+sort integration test and silence the benign React Query `act()` warning so the suite can fail on console errors
 
 ---
 
