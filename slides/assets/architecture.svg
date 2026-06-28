@@ -1,0 +1,96 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none"
+     xmlns="http://www.w3.org/2000/svg" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Inter:wght@400;500&amp;display=swap');
+      .kicker { font: 500 12px 'Inter', sans-serif; letter-spacing: 2px; fill: #969ca6; }
+      .title  { font: 600 32px 'Space Grotesk', sans-serif; letter-spacing: -0.5px; fill: #e9eaed; }
+      .cap    { font: 400 13px 'Inter', sans-serif; fill: #969ca6; }
+      .dir    { font: 600 17px 'IBM Plex Mono', monospace; fill: #e9eaed; }
+      .dir-sm { font: 600 16px 'IBM Plex Mono', monospace; fill: #e9eaed; }
+      .desc   { font: 400 12.5px 'Inter', sans-serif; fill: #969ca6; }
+      .desc-sm{ font: 400 12px 'Inter', sans-serif; fill: #969ca6; }
+      .foot   { font: 400 11px 'IBM Plex Mono', monospace; fill: #5a5f68; }
+    </style>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="5" refY="4"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L7,4 L0,8 Z" fill="#5a6170"/>
+    </marker>
+  </defs>
+
+  <!-- page -->
+  <rect width="1280" height="720" fill="#121317"/>
+
+  <!-- header -->
+  <text x="56" y="62" class="kicker">USERS DIRECTORY</text>
+  <text x="56" y="98" class="title">Folder Architecture</text>
+  <rect x="56" y="112" width="44" height="3" rx="1.5" fill="#e9eaed"/>
+
+  <!-- ───────────────── LEFT: layers ───────────────── -->
+  <text x="56" y="180" class="cap">Four layers — imports flow downward only</text>
+
+  <!-- app -->
+  <rect x="56" y="196" width="544" height="72" rx="12" fill="#1a1c21" stroke="#2b2e35"/>
+  <text x="80" y="234" class="dir">app/</text>
+  <text x="80" y="256" class="desc">Wiring — navigation container + providers</text>
+
+  <!-- features -->
+  <rect x="56" y="300" width="544" height="72" rx="12" fill="#1a1c21" stroke="#2b2e35"/>
+  <text x="80" y="338" class="dir">features/</text>
+  <text x="80" y="360" class="desc">Domain logic + screens · composes ui and lib</text>
+
+  <!-- ui -->
+  <rect x="56" y="404" width="262" height="128" rx="12" fill="#1a1c21" stroke="#2b2e35"/>
+  <text x="80" y="442" class="dir-sm">ui/</text>
+  <text x="80" y="466" class="desc-sm">Generic design system.</text>
+  <text x="80" y="486" class="desc-sm">Button · Input · Card · Avatar…</text>
+
+  <!-- lib -->
+  <rect x="338" y="404" width="262" height="128" rx="12" fill="#1a1c21" stroke="#2b2e35"/>
+  <text x="362" y="442" class="dir-sm">lib/</text>
+  <text x="362" y="466" class="desc-sm">Cross-cutting infra.</text>
+  <text x="362" y="486" class="desc-sm">apiClient · queryClient · env</text>
+
+  <!-- dependency arrows -->
+  <line x1="328" y1="272" x2="328" y2="296" stroke="#5a6170" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="328,376 328,390 187,390 187,400" fill="none" stroke="#5a6170" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="328,376 328,390 469,390 469,400" fill="none" stroke="#5a6170" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="56" y="566" class="cap">ui/ and lib/ import nothing upward — the design</text>
+  <text x="56" y="585" class="cap">system knows nothing of users or the API.</text>
+
+  <!-- ───────────────── RIGHT: feature anatomy ───────────────── -->
+  <text x="648" y="180" class="cap">One feature = one self-contained vertical slice</text>
+
+  <rect x="648" y="196" width="576" height="456" rx="14" fill="#1a1c21" stroke="#2b2e35"/>
+  <text x="676" y="240" class="dir">features/users/</text>
+  <line x1="676" y1="258" x2="1196" y2="258" stroke="#2b2e35" stroke-width="1"/>
+
+  <!-- api -->
+  <rect x="676" y="288" width="3" height="34" rx="1.5" fill="#e9eaed"/>
+  <text x="694" y="304" class="dir-sm">api/</text>
+  <text x="694" y="324" class="desc-sm">Endpoints + React Query hooks · query keys · cache</text>
+
+  <!-- components -->
+  <rect x="676" y="360" width="3" height="34" rx="1.5" fill="#e9eaed"/>
+  <text x="694" y="376" class="dir-sm">components/</text>
+  <text x="694" y="396" class="desc-sm">Presentational composites — UserListItem, headers</text>
+
+  <!-- lib -->
+  <rect x="676" y="432" width="3" height="34" rx="1.5" fill="#e9eaed"/>
+  <text x="694" y="448" class="dir-sm">lib/</text>
+  <text x="694" y="468" class="desc-sm">Pure helpers — filter · sections · flatten</text>
+
+  <!-- screens -->
+  <rect x="676" y="504" width="3" height="34" rx="1.5" fill="#e9eaed"/>
+  <text x="694" y="520" class="dir-sm">screens/</text>
+  <text x="694" y="540" class="desc-sm">Home · UserDetail — the only callers of data hooks</text>
+
+  <!-- types -->
+  <rect x="676" y="576" width="3" height="34" rx="1.5" fill="#e9eaed"/>
+  <text x="694" y="592" class="dir-sm">types/</text>
+  <text x="694" y="612" class="desc-sm">User domain types mirroring the API shape</text>
+
+  <!-- footer -->
+  <text x="1224" y="700" text-anchor="end" class="foot">github.com/arturschwarz/cc-main-case</text>
+</svg>

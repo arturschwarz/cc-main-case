@@ -1,0 +1,16 @@
+{
+  "name": "users-directory-slides",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Slidev deck for the Users Directory take-home (standalone project).",
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.16.0",
+    "@slidev/theme-default": "^0.25.0"
+  }
+}

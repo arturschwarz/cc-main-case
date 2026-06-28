@@ -1,0 +1,186 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Users Directory — "minimal" deck theme
+   White, ink text, thin neutral lines. Near-monochrome and quiet; the serif
+   title is the only expressive element.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #121317;           /* near-black page */
+  --surface: #1a1c21;      /* slightly raised card */
+  --ink: #e9eaed;          /* near-white text */
+  --ink-soft: #969ca6;     /* muted gray */
+  --line: #2b2e35;         /* hairline */
+  --line-soft: #23262c;
+  --accent: #e9eaed;       /* monochrome — accent is just ink */
+  --accent-soft: #1f2228;
+  --slidev-theme-primary: #e9eaed;
+}
+
+/* Base page. */
+.slidev-layout {
+  background-color: var(--bg) !important;
+  color: var(--ink) !important;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  padding: 3.2rem 3.6rem;
+}
+
+/* Features slide: horizontal fade from the base color (left) to black (right),
+   with the transition through the center. `features-slide` is added via the
+   slide's `layoutClass`, so it lands on `.slidev-layout`. */
+.slidev-layout.features-slide {
+  background-image: linear-gradient(to right, var(--bg) 22%, #000000 78%) !important;
+}
+
+/* ── Consistent title on every slide ───────────────────────────────────────
+   Serif heading. (The deck progress bar lives in the bottom footer, see
+   global-bottom.vue.) */
+.slidev-layout h1 {
+  font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 2.1rem;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--ink) !important;
+  padding-bottom: 0.4em;
+  margin-bottom: 1em;
+  position: relative;
+}
+
+/* Lists with a quiet en-dash marker. */
+.slidev-layout ul {
+  list-style: none;
+  padding-left: 0.1rem;
+}
+.slidev-layout ul li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin: 0.38rem 0;
+  line-height: 1.5;
+}
+.slidev-layout ul li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--ink-soft);
+}
+.slidev-layout ul li ul li::before {
+  content: '·';
+  color: var(--ink-soft);
+}
+
+.slidev-layout strong { color: var(--ink); font-weight: 600; }
+.slidev-layout em { color: var(--ink); font-style: italic; }
+.slidev-layout a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+.slidev-layout code {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+/* ── Helper classes ───────────────────────────────────────────────────────*/
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.muted { color: var(--ink-soft); }
+.accent { color: var(--ink); }
+
+/* Cover */
+.cover { text-align: left; }
+.cover__title {
+  font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-size: 4.6rem;
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin: 0.3em 0 0.25em;
+}
+.cover__subtitle {
+  color: var(--ink-soft);
+  font-size: 1.2rem;
+  max-width: 40ch;
+}
+.cover__rule {
+  width: 3rem;
+  height: 2px;
+  background: var(--ink);
+  margin: 1.2rem 0 0;
+}
+.cover__meta { color: var(--ink-soft); margin-top: 1.2rem; font-size: 0.82rem; letter-spacing: 0.05em; }
+
+/* Screenshot placeholders */
+.shots { display: flex; flex-direction: column; gap: 0.8rem; height: 100%; justify-content: center; }
+.shot {
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  min-height: 6.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+/* Two-column free layout */
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+}
+.panel h3 {
+  font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Callout box */
+.callout {
+  border-left: 2px solid var(--ink);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 0.7rem 1rem;
+  margin-top: 1rem;
+  color: var(--ink);
+}
+
+/* Mono diagram block — monospace for alignment, plain card. */
+.diagram {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.86rem;
+  white-space: pre;
+  line-height: 1.6;
+}
+
+/* QR card on the outro */
+.qr-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  width: 200px;
+}
+.qr-card img { width: 100%; display: block; image-rendering: pixelated; }
+.qr-label { color: var(--ink-soft); margin-top: 0.7rem; font-size: 0.85rem; text-align: center; font-size: 10px; }
