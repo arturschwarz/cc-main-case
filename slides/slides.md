@@ -17,7 +17,7 @@ fonts:
 ---
 
 <div class="cover">
-  <div class="kicker">Celebrate Company Main Case</div>
+  <div class="kicker">CC Main Case</div>
   <div
     class="cover__title"
     v-motion
